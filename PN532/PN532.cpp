@@ -283,10 +283,13 @@ bool PN532::setPassiveActivationRetries(uint8_t maxRetries)
     @param  timeout       The number of tries before timing out
     @param  inlist        If set to true, the card will be inlisted
 
+    @param  ATAQ          if not null pointer to uint16_t where to put ATAQ value
+    @param  SAK           if not null pointer to uint8_t where to put SAK value
+	
     @returns 1 if everything executed properly, 0 for an error
 */
 /**************************************************************************/
-bool PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid, uint8_t *uidLength, uint16_t timeout, bool inlist)
+bool PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid, uint8_t *uidLength, uint16_t timeout, bool inlist, uint16_t *ATQA , uint8_t *SAK )
 {
     pn532_packetbuffer[0] = PN532_COMMAND_INLISTPASSIVETARGET;
     pn532_packetbuffer[1] = 1;  // max 1 cards at once (we can set this to 2 later)
@@ -322,7 +325,9 @@ bool PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid, uint8_t *uid
     sens_res |= pn532_packetbuffer[3];
 
     DMSG("ATQA: 0x");  DMSG_HEX(sens_res);
+    if (ATQA) *ATQA = sens_res;
     DMSG("SAK: 0x");  DMSG_HEX(pn532_packetbuffer[4]);
+    if (SAK) *SAK = pn532_packetbuffer[4];
     DMSG("\n");
 
     /* Card appears to be Mifare Classic */
